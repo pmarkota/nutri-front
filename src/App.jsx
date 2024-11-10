@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
@@ -31,30 +32,32 @@ function App() {
         <Navbar />
         <main className="pt-20">
           <Toaster position="top-right" />
-          <Routes>
-            <Route
-              path="/register"
-              element={
-                <PublicRoute>
-                  <Register />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <Navigate to={isAuthenticated() ? "/home" : "/register"} />
-              }
-            />
-          </Routes>
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route
+                path="/register"
+                element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/home"
+                element={
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/"
+                element={
+                  <Navigate to={isAuthenticated() ? "/home" : "/register"} />
+                }
+              />
+            </Routes>
+          </AnimatePresence>
         </main>
       </div>
     </Router>
