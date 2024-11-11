@@ -1,24 +1,34 @@
 import { useGoogleLogin } from "@react-oauth/google";
+
 import { API_BASE_URL } from "../config/api";
+
 import toast from "react-hot-toast";
+
 import { useNavigate } from "react-router-dom";
+
 import { useState } from "react";
 
 export default function GoogleLogin() {
   const navigate = useNavigate();
+
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+
   const [password, setPassword] = useState("");
+
   const [googleData, setGoogleData] = useState(null);
 
   const handleExistingGoogleUser = async (userData) => {
     try {
       const response = await fetch(`${API_BASE_URL}auth/google/login`, {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           accessToken: userData.accessToken,
+
           email: userData.email,
         }),
       });
@@ -30,11 +40,85 @@ export default function GoogleLogin() {
       }
 
       localStorage.setItem("token", data.token);
+
       toast.success("Successfully logged in with Google!");
+
       navigate("/home");
     } catch (error) {
       toast.error("Failed to login");
+
       console.error("Google login error:", error);
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!password || !googleData) {
+      toast.error("Please enter a password");
+
+      return;
+    }
+
+    try {
+      console.log("Sending registration request with data:", {
+        ...googleData,
+
+        password: password,
+      });
+
+      const response = await fetch(`${API_BASE_URL}Users/register`, {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          email: googleData.email,
+
+          name: googleData.name,
+
+          password: password,
+
+          googleId: googleData.googleId,
+
+          picture: googleData.picture,
+
+          lastLogin: new Date().toISOString(),
+        }),
+      });
+
+      // First check if we can parse the response as JSON
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        // If not JSON, get the response as text
+        data = await response.text();
+        console.log("Non-JSON response:", data);
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          typeof data === "object"
+            ? data.message
+            : data || "Registration failed"
+        );
+      }
+
+      toast.success("Registration successful!");
+
+      // After successful registration, log the user in
+
+      await handleExistingGoogleUser(googleData);
+
+      setShowPasswordModal(false);
+    } catch (error) {
+      toast.error(error.message || "Failed to register");
+
+      console.error("Registration error:", error);
     }
   };
 
@@ -43,6 +127,7 @@ export default function GoogleLogin() {
       try {
         const userInfoResponse = await fetch(
           "https://www.googleapis.com/oauth2/v3/userinfo",
+
           {
             headers: {
               Authorization: `Bearer ${tokenResponse.access_token}`,
@@ -51,44 +136,63 @@ export default function GoogleLogin() {
         );
 
         const userInfo = await userInfoResponse.json();
+
         const userData = {
           accessToken: tokenResponse.access_token,
+
           email: userInfo.email,
+
           googleId: userInfo.sub,
+
           name: userInfo.name,
+
           picture: userInfo.picture,
         };
 
         // Check if user exists
+
         const checkResponse = await fetch(
           `${API_BASE_URL}auth/google/check-email`,
+
           {
             method: "POST",
+
             headers: {
               "Content-Type": "application/json",
             },
+
             body: JSON.stringify({ email: userInfo.email }),
           }
         );
 
-        if (checkResponse.ok) {
+        const checkData = await checkResponse.json();
+
+        if (checkResponse.ok && checkData.exists) {
           // User exists, proceed with login
+
           await handleExistingGoogleUser(userData);
         } else {
           // New user, show password modal
+
           setGoogleData(userData);
+
           setShowPasswordModal(true);
         }
       } catch (error) {
         toast.error("Failed to get Google user info");
+
         console.error("Google login error:", error);
       }
     },
+
     onError: (error) => {
       console.error("Google OAuth Error:", error);
+
       toast.error("Failed to login with Google");
     },
+
     scope: "email profile openid",
+
     flow: "implicit",
   });
 
@@ -125,10 +229,7 @@ export default function GoogleLogin() {
 
       {showPasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <form
-            onSubmit={handlePasswordSubmit}
-            className="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl"
-          >
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl">
             <h3 className="text-lg font-medium mb-2 text-gray-900">
               Set Password
             </h3>
@@ -152,13 +253,14 @@ export default function GoogleLogin() {
                 Cancel
               </button>
               <button
-                type="submit"
+                type="button"
+                onClick={handlePasswordSubmit}
                 className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-md hover:opacity-90 transition-opacity duration-200"
               >
                 Complete Registration
               </button>
             </div>
-          </form>
+          </div>
         </div>
       )}
     </>
