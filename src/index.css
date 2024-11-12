@@ -2,6 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  @apply overflow-x-hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    to bottom,
+    theme("colors.emerald.50"),
+    theme("colors.cyan.50")
+  );
+}
+
+.dark .app-container {
+  background: linear-gradient(
+    to bottom,
+    theme("colors.gray.900"),
+    theme("colors.gray.800")
+  );
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 4rem; /* Adjust based on your navbar height */
+}
+
+/* Add smooth page transitions */
+.page-transition {
+  @apply absolute w-full;
+  transition: opacity 0.3s ease;
+}
+
+/* Prevent FOUC (Flash of Unstyled Content) */
+.no-fouc {
+  @apply opacity-0;
+}
+
+.fouc-ready {
+  @apply opacity-100;
+  transition: opacity 0.3s ease;
+}
+
 /* Page Transition Animations */
 .page-transition {
   animation: fadeIn 0.3s ease-in-out;

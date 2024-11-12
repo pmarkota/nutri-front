@@ -1,4 +1,19 @@
 /* Add or update this CSS rule to your global styles */
 body {
-  transition: background-color 0.5s ease, color 0.5s ease; /* Adjust the duration as needed */
+  @apply overflow-x-hidden; /* Prevent horizontal scrollbar during transitions */
+  transition: color 0.3s ease;
+  background: transparent;
+}
+
+/* Remove any background transitions from the body */
+body,
+#root {
+  transition: color 0.3s ease;
+  background: transparent;
+}
+
+/* Add smooth page transitions */
+.page-transition {
+  @apply absolute w-full;
+  transition: opacity 0.3s ease;
 }

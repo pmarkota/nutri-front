@@ -21,5 +21,12 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      document.documentElement.classList.add("no-fouc");
+      window.addEventListener("load", function () {
+        document.documentElement.classList.remove("no-fouc");
+        document.documentElement.classList.add("fouc-ready");
+      });
+    </script>
   </body>
 </html>

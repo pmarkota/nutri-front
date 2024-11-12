@@ -287,8 +287,17 @@ export default function UserDashboard() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-emerald-400 to-cyan-500">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+      <div
+        className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-cyan-50 
+        dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 
+        flex justify-center items-center"
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="w-12 h-12 rounded-full border-2 border-emerald-500/20 
+            border-t-emerald-500 animate-spin"
+        />
       </div>
     );
   }

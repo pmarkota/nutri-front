@@ -42,13 +42,12 @@ function AppRoutes() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+    <div className="app-container">
       <Navbar />
-      <main className="pt-16">
+      <main className="main-content">
         <Toaster
           position="top-right"
           toastOptions={{
-            // Add dark mode styling to toasts
             className: "dark:bg-dark-card dark:text-white",
           }}
         />
