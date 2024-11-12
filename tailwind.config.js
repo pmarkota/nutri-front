@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
   theme: {
@@ -34,6 +34,7 @@ export default {
         float3: "float3 2.5s ease-in-out infinite",
         float4: "float4 2.5s ease-in-out infinite",
         shimmer: "shimmer 2s linear infinite",
+        "spin-slow": "spin-slow 8s linear infinite",
       },
       keyframes: {
         fadeIn: {
@@ -59,6 +60,10 @@ export default {
         shimmer: {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
+        },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
         },
       },
       backdropBlur: {
