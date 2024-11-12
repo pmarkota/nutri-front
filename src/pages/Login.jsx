@@ -53,10 +53,24 @@ export default function Login() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4">
-        <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign in to your account
-          </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg backdrop-blur-sm bg-opacity-90 dark:bg-opacity-90"
+        >
+          <div className="text-center space-y-2">
+            <motion.h2
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl font-extrabold bg-gradient-to-r from-emerald-600 to-cyan-500 bg-clip-text text-transparent"
+            >
+              Welcome Back
+            </motion.h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Sign in to continue your journey
+            </p>
+          </div>
 
           {/* Centered text and button */}
           <div className="text-center space-y-3">
@@ -96,47 +110,131 @@ export default function Login() {
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="rounded-md shadow-sm space-y-4">
-              <div>
-                <label htmlFor="email" className="sr-only">
-                  Email address
+            <div className="space-y-4">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="relative group"
+              >
+                <label
+                  htmlFor="email"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2"
+                >
+                  Email
                 </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-all duration-200"
-                  placeholder="Email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="sr-only">
+                <div className="mt-1 relative">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                      bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                      focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+                      dark:focus:ring-emerald-400 dark:focus:border-emerald-400
+                      transition-all duration-200"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="relative group"
+              >
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-2"
+                >
                   Password
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm transition-all duration-200"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
+                <div className="mt-1 relative">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                      bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                      focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+                      dark:focus:ring-emerald-400 dark:focus:border-emerald-400
+                      transition-all duration-200"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+              </motion.div>
             </div>
 
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-emerald-500 to-cyan-500 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200"
+                className="group relative w-full flex justify-center py-3 px-4 
+                  bg-gradient-to-r from-emerald-500 to-cyan-500 
+                  hover:from-emerald-600 hover:to-cyan-600
+                  text-white text-sm font-semibold rounded-lg
+                  transform transition-all duration-200 ease-in-out
+                  hover:scale-[1.02] active:scale-[0.98]
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
               >
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <svg
+                    className="h-5 w-5 text-emerald-200 group-hover:text-emerald-100"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                    />
+                  </svg>
+                </span>
                 Sign in
               </button>
-            </div>
+            </motion.div>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -151,7 +249,7 @@ export default function Login() {
 
             <GoogleLogin />
           </form>
-        </div>
+        </motion.div>
       </div>
     </PageTransition>
   );
