@@ -148,7 +148,8 @@ export default function Login() {
                       bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
                       focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
                       dark:focus:ring-emerald-400 dark:focus:border-emerald-400
-                      transition-all duration-200"
+                      transition-all duration-200
+                      dark:focus:bg-gray-700"
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={handleChange}
@@ -193,7 +194,8 @@ export default function Login() {
                       bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
                       focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
                       dark:focus:ring-emerald-400 dark:focus:border-emerald-400
-                      transition-all duration-200"
+                      transition-all duration-200
+                      dark:focus:bg-gray-700"
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
