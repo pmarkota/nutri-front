@@ -16,20 +16,20 @@ import { motion } from "framer-motion";
 const checkUserProfile = async (token, userId) => {
   try {
     const response = await fetch(`${API_BASE_URL}Users/profile`, {
-      method: "POST", // Changed to POST
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(userId), // Send userId in the body
+      body: JSON.stringify(userId), // Send the GUID directly
     });
 
     if (!response.ok) {
       throw new Error("Failed to fetch user profile");
     }
 
-    const profile = await response.json();
-    return !!profile.username; // Returns true if username exists, false if null/empty
+    const userProfile = await response.json();
+    return !!userProfile.username; // Returns true if username exists, false if null/empty
   } catch (error) {
     console.error("Error checking user profile:", error);
     return false;
@@ -73,18 +73,17 @@ export default function GoogleLogin() {
       const token = await response.text();
       localStorage.setItem("token", token);
 
-      // Decode token to get userId first
+      // Decode token to get userId
       const decodedToken = jwtDecode(token);
-      const userId = decodedToken.sub;
+      const userId = decodedToken.sub; // This should be the GUID
 
-      // Check if user has a username, passing both token and userId
+      // Check if user has a username by passing the GUID
       const hasUsername = await checkUserProfile(token, userId);
 
       if (!hasUsername) {
         setUserId(userId);
         setShowUsernameModal(true);
       } else {
-        // User already has a username, proceed to home
         toast.success("Successfully logged in!");
         navigate("/home");
       }

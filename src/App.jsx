@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
 import { Toaster } from "react-hot-toast";
 import PropTypes from "prop-types";
+import UserDashboard from "./pages/UserDashboard";
 
 // Move the routes into a separate component that will be wrapped by Router
 function AppRoutes() {
@@ -43,7 +44,7 @@ function AppRoutes() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
       <Navbar />
-      <main className="pt-20">
+      <main className="pt-16">
         <Toaster
           position="top-right"
           toastOptions={{
@@ -70,6 +71,14 @@ function AppRoutes() {
               }
             />
             <Route path="/login" element={<Login />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <UserDashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/"
               element={
