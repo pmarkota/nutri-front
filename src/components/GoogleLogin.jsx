@@ -8,6 +8,34 @@ import { useNavigate } from "react-router-dom";
 
 import { useState } from "react";
 
+import { jwtDecode } from "jwt-decode";
+
+import { motion } from "framer-motion";
+
+// Update the checkUserProfile function
+const checkUserProfile = async (token, userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}Users/profile`, {
+      method: "POST", // Changed to POST
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userId), // Send userId in the body
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user profile");
+    }
+
+    const profile = await response.json();
+    return !!profile.username; // Returns true if username exists, false if null/empty
+  } catch (error) {
+    console.error("Error checking user profile:", error);
+    return false;
+  }
+};
+
 export default function GoogleLogin() {
   const navigate = useNavigate();
 
@@ -17,6 +45,11 @@ export default function GoogleLogin() {
 
   const [googleData, setGoogleData] = useState(null);
 
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  // Update the handleExistingGoogleUser function
   const handleExistingGoogleUser = async (userData) => {
     try {
       console.log("Attempting Google login with:", userData.email);
@@ -32,31 +65,32 @@ export default function GoogleLogin() {
         }),
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response headers:", [...response.headers.entries()]);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error("Google login failed");
+        throw new Error(errorText || "Google login failed");
       }
 
-      try {
-        // Try to get response as text first
-        const responseText = await response.text();
-        console.log("Raw response:", responseText);
+      const token = await response.text();
+      localStorage.setItem("token", token);
 
-        // Store the token regardless of format
-        localStorage.setItem("token", responseText);
-        toast.success("Successfully logged in with Google!");
+      // Decode token to get userId first
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.sub;
+
+      // Check if user has a username, passing both token and userId
+      const hasUsername = await checkUserProfile(token, userId);
+
+      if (!hasUsername) {
+        setUserId(userId);
+        setShowUsernameModal(true);
+      } else {
+        // User already has a username, proceed to home
+        toast.success("Successfully logged in!");
         navigate("/home");
-      } catch (parseError) {
-        console.error("Error processing response:", parseError);
-        toast.error("Error processing login response");
       }
     } catch (error) {
-      console.error("Google login error:", error);
       toast.error(error.message || "Failed to login");
+      console.error("Google login error:", error);
     }
   };
 
@@ -205,6 +239,43 @@ export default function GoogleLogin() {
     flow: "implicit",
   });
 
+  const handleUsernameSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!username.trim()) {
+      toast.error("Please enter a username");
+      return;
+    }
+
+    try {
+      console.log("Updating profile with:", { userId, username });
+      const response = await fetch(`${API_BASE_URL}Users/update-profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          userId: userId,
+          username: username,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Profile update error response:", errorText);
+        throw new Error("Failed to update username");
+      }
+
+      toast.success("Welcome to NutriApp!");
+      setShowUsernameModal(false);
+      navigate("/home");
+    } catch (error) {
+      toast.error(error.message || "Failed to update username");
+      console.error("Username update error:", error);
+    }
+  };
+
   return (
     <>
       <button
@@ -279,6 +350,124 @@ export default function GoogleLogin() {
             </div>
           </div>
         </div>
+      )}
+
+      {showUsernameModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-sm w-full shadow-xl"
+          >
+            <div className="space-y-6">
+              <div className="text-center">
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="h-20 w-20 mx-auto mb-4 relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full animate-pulse"></div>
+                  <div className="absolute inset-1 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-10 h-10 text-emerald-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  </div>
+                </motion.div>
+
+                <motion.h3
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-500 bg-clip-text text-transparent"
+                >
+                  Welcome to NutriApp!
+                </motion.h3>
+
+                <motion.p
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-2 text-sm text-gray-600 dark:text-gray-300"
+                >
+                  Choose a username to complete your profile
+                </motion.p>
+              </div>
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="relative"
+              >
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                    focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+                    dark:focus:ring-emerald-400 dark:focus:border-emerald-400
+                    outline-none transition-all duration-200
+                    pl-12"
+                  placeholder="Enter username"
+                  autoFocus
+                />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                  @
+                </span>
+              </motion.div>
+
+              <motion.button
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                onClick={handleUsernameSubmit}
+                className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-cyan-500 
+                  text-white rounded-lg font-medium
+                  transform transition-all duration-200
+                  hover:from-emerald-600 hover:to-cyan-600
+                  hover:scale-[1.02] active:scale-[0.98]
+                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500
+                  shadow-lg hover:shadow-xl
+                  group"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  Get Started
+                  <svg
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </span>
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </>
   );
