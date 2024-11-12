@@ -19,35 +19,44 @@ export default function GoogleLogin() {
 
   const handleExistingGoogleUser = async (userData) => {
     try {
+      console.log("Attempting Google login with:", userData.email);
+
       const response = await fetch(`${API_BASE_URL}auth/google/login`, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           accessToken: userData.accessToken,
-
           email: userData.email,
         }),
       });
 
-      const data = await response.json();
+      console.log("Response status:", response.status);
+      console.log("Response headers:", [...response.headers.entries()]);
 
       if (!response.ok) {
-        throw new Error(data.message || "Google login failed");
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error("Google login failed");
       }
 
-      localStorage.setItem("token", data.token);
+      try {
+        // Try to get response as text first
+        const responseText = await response.text();
+        console.log("Raw response:", responseText);
 
-      toast.success("Successfully logged in with Google!");
-
-      navigate("/home");
+        // Store the token regardless of format
+        localStorage.setItem("token", responseText);
+        toast.success("Successfully logged in with Google!");
+        navigate("/home");
+      } catch (parseError) {
+        console.error("Error processing response:", parseError);
+        toast.error("Error processing login response");
+      }
     } catch (error) {
-      toast.error("Failed to login");
-
       console.error("Google login error:", error);
+      toast.error(error.message || "Failed to login");
     }
   };
 
@@ -201,7 +210,11 @@ export default function GoogleLogin() {
       <button
         type="button"
         onClick={() => login()}
-        className="w-full flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200"
+        className="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-700 
+          text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 
+          rounded-md px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600 
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 
+          dark:focus:ring-offset-gray-800 transition-all duration-200"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path
@@ -228,19 +241,23 @@ export default function GoogleLogin() {
       </button>
 
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-medium mb-2 text-gray-900">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">
               Set Password
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               Please set a password to complete your registration
             </p>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all duration-200"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 mb-4 
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+                dark:focus:ring-emerald-400 dark:focus:border-emerald-400
+                outline-none transition-all duration-200"
               placeholder="Enter password"
               autoFocus
             />
