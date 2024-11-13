@@ -5,9 +5,11 @@ import toast from "react-hot-toast";
 import GoogleLogin from "../components/GoogleLogin";
 import { motion } from "framer-motion";
 import PageTransition from "../components/PageTransition";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,9 +34,8 @@ export default function Login() {
         throw new Error(errorData || "Login failed");
       }
 
-      // Get token directly as text
       const token = await response.text();
-      localStorage.setItem("token", token);
+      login(token);
       toast.success("Successfully logged in!");
       navigate("/home");
     } catch (error) {

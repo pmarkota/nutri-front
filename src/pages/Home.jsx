@@ -17,12 +17,8 @@ export default function Home() {
 
           {/* Cards */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 
-
-              hover:shadow-xl transition-shadow duration-200"
-            >
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="p-6 transition-shadow duration-200 bg-white shadow-lg dark:bg-gray-800 rounded-xl hover:shadow-xl">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Your Progress
               </h2>

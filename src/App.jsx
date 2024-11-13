@@ -13,6 +13,7 @@ import Navbar from "./components/Navbar";
 import { Toaster } from "react-hot-toast";
 import PropTypes from "prop-types";
 import UserDashboard from "./pages/UserDashboard";
+import { AuthProvider } from "./context/AuthContext";
 
 // Move the routes into a separate component that will be wrapped by Router
 function AppRoutes() {
@@ -94,9 +95,11 @@ function AppRoutes() {
 // Main App component that provides the Router context
 function App() {
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 

@@ -1,4 +1,4 @@
-import { useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin as useGoogleLoginHook } from "@react-oauth/google";
 
 import { API_BASE_URL } from "../config/api";
 
@@ -11,6 +11,8 @@ import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
 import { motion } from "framer-motion";
+
+import { useAuth } from "../context/AuthContext";
 
 // Update the checkUserProfile function
 const checkUserProfile = async (token, userId) => {
@@ -38,6 +40,7 @@ const checkUserProfile = async (token, userId) => {
 
 export default function GoogleLogin() {
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
@@ -71,13 +74,13 @@ export default function GoogleLogin() {
       }
 
       const token = await response.text();
-      localStorage.setItem("token", token);
+      authLogin(token);
 
       // Decode token to get userId
       const decodedToken = jwtDecode(token);
-      const userId = decodedToken.sub; // This should be the GUID
+      const userId = decodedToken.sub;
 
-      // Check if user has a username by passing the GUID
+      // Check if user has a username
       const hasUsername = await checkUserProfile(token, userId);
 
       if (!hasUsername) {
@@ -164,7 +167,7 @@ export default function GoogleLogin() {
     }
   };
 
-  const login = useGoogleLogin({
+  const googleLogin = useGoogleLoginHook({
     onSuccess: async (tokenResponse) => {
       try {
         const userInfoResponse = await fetch(
@@ -279,7 +282,7 @@ export default function GoogleLogin() {
     <>
       <button
         type="button"
-        onClick={() => login()}
+        onClick={() => googleLogin()}
         className="w-full flex items-center justify-center gap-2 bg-white dark:bg-gray-700 
           text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 
           rounded-md px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-600 
