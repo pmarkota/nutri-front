@@ -15,6 +15,7 @@ import PropTypes from "prop-types";
 import UserDashboard from "./pages/UserDashboard";
 import { AuthProvider } from "./context/AuthContext";
 import RecipeExplorer from "./pages/RecipeExplorer";
+import RecipeDetails from "./pages/RecipeDetails";
 
 // Move the routes into a separate component that will be wrapped by Router
 function AppRoutes() {
@@ -85,6 +86,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <RecipeExplorer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/recipes/:id"
+              element={
+                <ProtectedRoute>
+                  <RecipeDetails />
                 </ProtectedRoute>
               }
             />

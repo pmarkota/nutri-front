@@ -63,7 +63,7 @@ export default function Navbar() {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed w-full z-10 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 
+      className="fixed w-full z-50 bg-white dark:bg-gray-800 
         border-b border-gray-200 dark:border-gray-700"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

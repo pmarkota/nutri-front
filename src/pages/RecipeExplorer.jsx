@@ -6,6 +6,11 @@ import PageTransition from "../components/PageTransition";
 import PropTypes from "prop-types";
 import CircularProgress from "../components/CircularProgress";
 import NutrientDisplay from "../components/NutrientDisplay";
+import { useNavigate } from "react-router-dom";
+import CategoryBadge from "../components/recipe-explorer/CategoryBadge";
+import DifficultyIndicator from "../components/recipe-explorer/DifficultyIndicator";
+import CircularProgressCookTime from "../components/recipe-explorer/CircularProgressCookTime";
+import TimeDisplay from "../components/recipe-explorer/TimeDisplay";
 
 const inputStyles = `
   /* Remove spinner buttons for number inputs */
@@ -522,160 +527,180 @@ FilterSection.propTypes = {
 
 const RecipeCard = ({ recipe }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
 
-  // Calculate percentage for circular progress
-  const calculatePercentage = (value, max) => (value / max) * 100;
+  const formatTime = (minutes) => {
+    if (!minutes) return "N/A";
+    if (minutes < 60) return `${minutes}min`;
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes > 0
+      ? `${hours}h ${remainingMinutes}m`
+      : `${hours}h`;
+  };
+
+  const truncateDescription = (text, maxLength = 50) => {
+    if (!text) return "";
+    return text.length > maxLength
+      ? `${text.substring(0, maxLength)}...`
+      : text;
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative h-[340px] group perspective"
+      className="relative h-[400px] group preserve-3d perspective-1000 cursor-pointer"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      onClick={() => navigate(`/recipes/${recipe.id}`)}
     >
-      <div className="relative w-full h-full">
-        {/* Main Card Container */}
-        <motion.div
-          animate={{
-            y: isHovered ? -8 : 0,
-            scale: isHovered ? 1.02 : 1,
-          }}
-          className="absolute inset-0 rounded-[2rem] overflow-hidden
-            bg-gradient-to-br from-white/90 to-white/50 
-            dark:from-gray-800/90 dark:to-gray-800/50 
-            backdrop-blur-lg shadow-xl
-            border border-white/20 dark:border-gray-700/20"
+      {/* Main Card */}
+      <motion.div
+        animate={{
+          rotateX: isHovered ? 5 : 0,
+          rotateY: isHovered ? -5 : 0,
+          translateZ: isHovered ? "20px" : "0px",
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        className="absolute inset-0 rounded-[2rem] overflow-hidden preserve-3d"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {/* Background Layers */}
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-white/90 to-white/50 
+          dark:from-gray-800/90 dark:to-gray-800/50 backdrop-blur-xl"
         >
-          {/* Hexagonal Pattern Background */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="honeycomb-pattern"></div>
-          </div>
+          {/* Animated gradient orbs */}
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 180, 360],
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-1/2 -right-1/2 w-full h-full 
+              bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 
+              rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1.2, 1, 1.2],
+              rotate: [360, 180, 0],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute -bottom-1/2 -left-1/2 w-full h-full 
+              bg-gradient-to-br from-cyan-500/10 to-emerald-500/10 
+              rounded-full blur-3xl"
+          />
+        </div>
 
-          {/* Content Container */}
-          <div className="relative p-6 h-full flex flex-col">
-            {/* Header Section */}
-            <div className="flex items-start justify-between">
-              {/* Title and Diet Badge */}
-              <div className="flex-1">
-                <motion.h3
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 
-                    dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent"
-                >
-                  {recipe.name}
-                </motion.h3>
-                {recipe.dietaryPreference && (
-                  <motion.span
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center mt-2 px-3 py-1 rounded-full text-sm
-                      bg-gradient-to-r from-emerald-100/50 to-cyan-100/50
-                      dark:from-emerald-900/50 dark:to-cyan-900/50
-                      text-emerald-700 dark:text-emerald-300
-                      border border-emerald-200 dark:border-emerald-800"
-                  >
-                    <span className="mr-1">
-                      {getDietIcon(recipe.dietaryPreference)}
-                    </span>
-                    {recipe.dietaryPreference}
-                  </motion.span>
-                )}
+        {/* Content Container */}
+        <div className="relative h-full p-6 flex flex-col preserve-3d">
+          {/* Header Section */}
+          <div className="space-y-4 mb-4">
+            <motion.div
+              animate={{ translateZ: isHovered ? "40px" : "0px" }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="space-y-2"
+            >
+              <h3
+                className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 
+                dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent"
+              >
+                {recipe.name}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 line-clamp-2">
+                {truncateDescription(recipe.description)}
+              </p>
+            </motion.div>
+
+            {/* Recipe Metadata */}
+            <motion.div
+              animate={{ translateZ: isHovered ? "50px" : "0px" }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="flex flex-wrap items-center gap-3"
+            >
+              {recipe.category && <CategoryBadge category={recipe.category} />}
+              {recipe.difficulty && (
+                <DifficultyIndicator difficulty={recipe.difficulty} />
+              )}
+              <div
+                className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700
+                text-gray-600 dark:text-gray-300 text-sm flex items-center"
+              >
+                {formatTime(recipe.totalTime)}
               </div>
-
-              {/* Circular Nutrition Overview */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative w-16 h-16"
-              >
-                <CircularProgress
-                  percentage={calculatePercentage(recipe.calories || 0, 2000)}
-                  color="emerald"
-                  size={64}
-                  thickness={4}
-                >
-                  <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                    {recipe.calories || 0}
-                    <small className="text-xs">kcal</small>
-                  </span>
-                </CircularProgress>
-              </motion.div>
-            </div>
-
-            {/* Description */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-4 text-gray-600 dark:text-gray-300 line-clamp-2"
-            >
-              {recipe.description}
-            </motion.p>
-
-            {/* Nutrition Grid */}
-            <div className="mt-auto grid grid-cols-3 gap-4">
-              {[
-                {
-                  label: "Protein",
-                  value: recipe.protein,
-                  icon: "💪",
-                  color: "blue",
-                },
-                {
-                  label: "Carbs",
-                  value: recipe.carbohydrates,
-                  icon: "🌾",
-                  color: "amber",
-                },
-                {
-                  label: "Fats",
-                  value: recipe.fats,
-                  icon: "🥑",
-                  color: "rose",
-                },
-              ].map((nutrient) => (
-                <NutrientDisplay
-                  key={nutrient.label}
-                  {...nutrient}
-                  isHovered={isHovered}
-                />
-              ))}
-            </div>
-
-            {/* Action Button */}
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
-              className="mt-4 w-full py-2.5 rounded-xl
-                bg-gradient-to-r from-emerald-500 to-cyan-500 
-                hover:from-emerald-600 hover:to-cyan-600
-                text-white font-medium
-                transform transition-all duration-200
-                flex items-center justify-center gap-2"
-            >
-              <span>View Recipe</span>
-              <motion.span
-                animate={{ x: isHovered ? 5 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                →
-              </motion.span>
-            </motion.button>
+            </motion.div>
           </div>
-        </motion.div>
 
-        {/* Background Glow Effect */}
-        <motion.div
-          animate={{
-            opacity: isHovered ? 1 : 0,
-            scale: isHovered ? 1 : 0.8,
-          }}
-          className="absolute inset-0 -z-10 rounded-[2rem]
-            bg-gradient-to-r from-emerald-500/10 to-cyan-500/10
-            blur-xl transform -translate-y-4"
-        />
-      </div>
+          {/* Nutrition Section */}
+          <motion.div
+            animate={{ translateZ: isHovered ? "60px" : "0px" }}
+            transition={{ type: "spring", stiffness: 300 }}
+            className="grid grid-cols-2 gap-4 mb-6"
+          >
+            {[
+              {
+                label: "Calories",
+                value: recipe.calories,
+                unit: "kcal",
+                icon: "🔥",
+              },
+              {
+                label: "Protein",
+                value: recipe.protein,
+                unit: "g",
+                icon: "💪",
+              },
+              {
+                label: "Carbs",
+                value: recipe.carbohydrates,
+                unit: "g",
+                icon: "🌾",
+              },
+              { label: "Fats", value: recipe.fats, unit: "g", icon: "🥑" },
+            ].map((nutrient, index) => (
+              <motion.div
+                key={nutrient.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="relative group/nutrient"
+              >
+                <div
+                  className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 
+                  rounded-xl opacity-0 group-hover/nutrient:opacity-100 transition-opacity"
+                />
+                <div
+                  className="relative p-4 rounded-xl border border-white/10 dark:border-gray-700/10
+                  bg-white/20 dark:bg-gray-800/20 backdrop-blur-sm"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{nutrient.icon}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {nutrient.label}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
+                    {nutrient.value || 0}
+                    {nutrient.unit}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Shadow */}
+      <motion.div
+        animate={{
+          scale: isHovered ? 1.05 : 1,
+          opacity: isHovered ? 0.2 : 0.1,
+        }}
+        className="absolute -inset-2 bg-gradient-to-br from-emerald-500 to-cyan-500 
+          rounded-[2rem] blur-2xl -z-10"
+      />
     </motion.div>
   );
 };
