@@ -14,6 +14,7 @@ import { Toaster } from "react-hot-toast";
 import PropTypes from "prop-types";
 import UserDashboard from "./pages/UserDashboard";
 import { AuthProvider } from "./context/AuthContext";
+import RecipeExplorer from "./pages/RecipeExplorer";
 
 // Move the routes into a separate component that will be wrapped by Router
 function AppRoutes() {
@@ -76,6 +77,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <UserDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/recipes"
+              element={
+                <ProtectedRoute>
+                  <RecipeExplorer />
                 </ProtectedRoute>
               }
             />
