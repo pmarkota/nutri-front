@@ -8,6 +8,7 @@ import CategoryBadge from "../components/recipe-explorer/CategoryBadge";
 import DifficultyIndicator from "../components/recipe-explorer/DifficultyIndicator";
 import ServingCalculator from "../components/recipe-details/ServingCalculator";
 import PropTypes from "prop-types";
+import { jwtDecode } from "jwt-decode";
 
 export default function RecipeDetails() {
   const { id } = useParams();
@@ -18,6 +19,7 @@ export default function RecipeDetails() {
   const [activeTab, setActiveTab] = useState("overview");
   const [checkedIngredients, setCheckedIngredients] = useState(new Set());
   const heroRef = useRef(null);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const normalizeDifficulty = (difficulty) => {
     const difficultyMap = {
@@ -54,6 +56,37 @@ export default function RecipeDetails() {
 
     fetchRecipe();
   }, [id, navigate]);
+
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.sub;
+
+        const response = await fetch(
+          `${API_BASE_URL}UserPreferences/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const favoriteRecipes = JSON.parse(data.favoriteRecipes || "[]");
+          setIsFavorite(favoriteRecipes.includes(id));
+        }
+      } catch (error) {
+        console.error("Error checking favorite status:", error);
+      }
+    };
+
+    if (id) {
+      checkFavoriteStatus();
+    }
+  }, [id]);
 
   const parseIngredients = (ingredientsString) => {
     try {
@@ -254,6 +287,142 @@ export default function RecipeDetails() {
     servings: PropTypes.number.isRequired,
   };
 
+  const handleFavoriteToggle = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.sub;
+
+      const endpoint = `${API_BASE_URL}UserPreferences/${userId}/favorite-recipes${
+        isFavorite ? `/${id}` : ""
+      }`;
+
+      const response = await fetch(endpoint, {
+        method: isFavorite ? "DELETE" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: !isFavorite ? JSON.stringify({ recipeId: id }) : undefined,
+      });
+
+      if (!response.ok) throw new Error("Failed to update favorite");
+
+      setIsFavorite(!isFavorite);
+      toast.success(
+        isFavorite ? "Removed from favorites" : "Added to favorites"
+      );
+    } catch (error) {
+      console.error("Error updating favorite:", error);
+      toast.error("Failed to update favorite");
+    }
+  };
+
+  // Replace the FavoriteParticles component with this new version
+  const FavoriteParticles = () => {
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Circular burst effect */}
+        <motion.div
+          initial={{ scale: 0, opacity: 1 }}
+          animate={{ scale: 2, opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="absolute inset-0 bg-gradient-to-r from-rose-500/20 to-pink-500/20 rounded-full"
+        />
+
+        {/* Floating hearts in a circle pattern */}
+        {[...Array(12)].map((_, i) => {
+          const angle = (i * 360) / 12; // Distribute hearts in a circle
+          const radius = 60; // Distance from center
+          const delay = i * 0.1; // Stagger the animations
+
+          return (
+            <motion.div
+              key={i}
+              className="absolute left-1/2 top-1/2"
+              initial={{
+                x: 0,
+                y: 0,
+                scale: 0,
+                opacity: 0,
+              }}
+              animate={{
+                x: radius * Math.cos(angle * (Math.PI / 180)),
+                y: radius * Math.sin(angle * (Math.PI / 180)),
+                scale: [0, 1, 0],
+                opacity: [0, 1, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                delay: delay,
+                repeat: Infinity,
+                repeatDelay: 2,
+              }}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-3 h-3 text-white"
+              >
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </motion.div>
+          );
+        })}
+
+        {/* Glowing orbs */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={`orb-${i}`}
+            className="absolute left-1/2 top-1/2 w-2 h-2 rounded-full bg-white/80"
+            initial={{
+              x: 0,
+              y: 0,
+              scale: 0,
+              opacity: 0,
+            }}
+            animate={{
+              x: Math.random() * 100 - 50,
+              y: Math.random() * 100 - 50,
+              scale: [0, 1.5, 0],
+              opacity: [0, 0.8, 0],
+            }}
+            transition={{
+              duration: 2,
+              delay: i * 0.2,
+              repeat: Infinity,
+              repeatDelay: 1,
+            }}
+          />
+        ))}
+
+        {/* Sparkle trails */}
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={`sparkle-${i}`}
+            className="absolute left-1/2 top-1/2 w-0.5 h-0.5 bg-white rounded-full"
+            initial={{
+              x: 0,
+              y: 0,
+              opacity: 0,
+            }}
+            animate={{
+              x: (Math.random() - 0.5) * 100,
+              y: (Math.random() - 0.5) * 100,
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 1,
+              delay: i * 0.05,
+              repeat: Infinity,
+              repeatDelay: 2,
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -359,6 +528,66 @@ export default function RecipeDetails() {
                 <DifficultyIndicator difficulty={recipe.difficulty} />
               )}
             </motion.div>
+
+            <div className="relative mt-8">
+              <motion.button
+                onClick={handleFavoriteToggle}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`
+                  relative overflow-hidden
+                  px-8 py-3 rounded-xl
+                  font-medium text-lg
+                  transition-all duration-300 ease-in-out
+                  ${
+                    isFavorite
+                      ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/25"
+                      : "bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 hover:text-white"
+                  }
+                  group
+                `}
+              >
+                {/* Animated gradient background */}
+                <div
+                  className={`
+                    absolute inset-0 
+                    bg-gradient-to-r from-rose-500 to-pink-500
+                    transition-opacity duration-300
+                    ${
+                      isFavorite
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100"
+                    }
+                  `}
+                />
+
+                {/* Particles */}
+                {isFavorite && <FavoriteParticles />}
+
+                {/* Button content */}
+                <div className="relative flex items-center gap-2">
+                  <motion.svg
+                    viewBox="0 0 24 24"
+                    fill={isFavorite ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-6 h-6"
+                    animate={{
+                      scale: isFavorite ? [1, 1.2, 1] : 1,
+                      rotate: isFavorite ? [0, -10, 10, 0] : 0,
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </motion.svg>
+                  <span className="relative">
+                    {isFavorite ? "Saved to Favorites" : "Save Recipe"}
+                  </span>
+                </div>
+              </motion.button>
+            </div>
           </div>
         </div>
 

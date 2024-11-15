@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import PageTransition from "../components/PageTransition";
 import { jwtDecode } from "jwt-decode";
+import FavoriteRecipes from "../components/dashboard/FavoriteRecipes";
 
 const StatCard = ({ title, value, icon, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -306,7 +307,7 @@ export default function UserDashboard() {
     <PageTransition>
       <div
         className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-cyan-50 
-        dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8"
+        dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -451,7 +452,7 @@ export default function UserDashboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               <StatCard
                 title="Fitness Goal"
                 value={userProfile?.goal}
@@ -512,6 +513,10 @@ export default function UserDashboard() {
                 }
                 onUpdate={(value) => handleUpdate("caloricGoal", value)}
               />
+            </div>
+
+            <div className="mt-12">
+              <FavoriteRecipes />
             </div>
 
             <motion.div
