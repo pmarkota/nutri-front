@@ -16,6 +16,7 @@ import UserDashboard from "./pages/UserDashboard";
 import { AuthProvider } from "./context/AuthContext";
 import RecipeExplorer from "./pages/RecipeExplorer";
 import RecipeDetails from "./pages/RecipeDetails";
+import MealPlanner from "./pages/MealPlanner";
 
 // Move the routes into a separate component that will be wrapped by Router
 function AppRoutes() {
@@ -62,6 +63,14 @@ function AppRoutes() {
                 <PublicRoute>
                   <Register />
                 </PublicRoute>
+              }
+            />
+            <Route
+              path="/meal-planner"
+              element={
+                <ProtectedRoute>
+                  <MealPlanner />
+                </ProtectedRoute>
               }
             />
             <Route

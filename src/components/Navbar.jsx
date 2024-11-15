@@ -91,6 +91,7 @@ export default function Navbar() {
                 <NavLink to="/home">Home</NavLink>
                 <NavLink to="/dashboard">Dashboard</NavLink>
                 <NavLink to="/recipes">Recipes</NavLink>
+                <NavLink to="/meal-planner">Meal Planner</NavLink>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -226,6 +227,7 @@ export default function Navbar() {
                   <NavLink to="/home">Home</NavLink>
                   <NavLink to="/dashboard">Dashboard</NavLink>
                   <NavLink to="/recipes">Recipes</NavLink>
+                  <NavLink to="/meal-planner">Meal Planner</NavLink>
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={handleLogout}
