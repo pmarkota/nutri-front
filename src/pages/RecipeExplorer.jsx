@@ -418,6 +418,46 @@ const FilterSection = ({ filters, setFilters, onSearch }) => {
             Customize Your Recipe Search
           </h2>
 
+          {/* Search Input - Featured at the top */}
+          <div className="mb-8">
+            <div className="relative">
+              <input
+                type="text"
+                value={filters.nameSearchTerm}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    nameSearchTerm: e.target.value,
+                  }))
+                }
+                placeholder="Search recipes by name..."
+                className="w-full px-6 py-4 rounded-xl border-2 border-transparent
+                  bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm
+                  text-gray-900 dark:text-white text-lg
+                  focus:border-emerald-500 dark:focus:border-emerald-400
+                  transition-all duration-200 outline-none
+                  placeholder-gray-400 dark:placeholder-gray-500
+                  shadow-lg hover:shadow-xl"
+              />
+              <div
+                className="absolute right-4 top-1/2 -translate-y-1/2 
+                text-gray-400 dark:text-gray-500 pointer-events-none"
+              >
+                <motion.span
+                  animate={{
+                    scale: filters.nameSearchTerm ? [1, 1.1, 1] : 1,
+                    rotate: filters.nameSearchTerm ? [0, -10, 0] : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="text-2xl"
+                >
+                  🔍
+                </motion.span>
+              </div>
+            </div>
+          </div>
+
+          {/* Existing Filter Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Custom Dietary Dropdown */}
             <div className="relative group">
@@ -520,6 +560,7 @@ FilterSection.propTypes = {
       .isRequired,
     maxFats: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       .isRequired,
+    nameSearchTerm: PropTypes.string.isRequired,
   }).isRequired,
   setFilters: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
@@ -799,6 +840,7 @@ export default function RecipeExplorer() {
     minProtein: "",
     maxCarbohydrates: "",
     maxFats: "",
+    nameSearchTerm: "",
   });
 
   const fetchRecipes = async (currentFilters) => {
@@ -807,6 +849,7 @@ export default function RecipeExplorer() {
       console.log("Fetching recipes with filters:", currentFilters);
 
       const requestBody = {
+        nameSearchTerm: currentFilters.nameSearchTerm || "",
         dietaryPreference: currentFilters.dietaryPreference || null,
         maxCalories:
           currentFilters.maxCalories === "" ? 3000 : currentFilters.maxCalories,

@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 import PageTransition from "../components/PageTransition";
 import CategoryBadge from "../components/recipe-explorer/CategoryBadge";
 import DifficultyIndicator from "../components/recipe-explorer/DifficultyIndicator";
-import ChartComponent from "../components/recipe-details/ChartComponent";
 import ServingCalculator from "../components/recipe-details/ServingCalculator";
+import PropTypes from "prop-types";
 
 export default function RecipeDetails() {
   const { id } = useParams();
@@ -71,6 +71,187 @@ export default function RecipeDetails() {
     const [_, amount, unit] = match;
     const scaledAmount = (parseFloat(amount) * servings).toFixed(1);
     return `${scaledAmount} ${unit}`;
+  };
+
+  const NutritionalBreakdown = ({ recipe, servings }) => {
+    const calculateScaledValue = (value) => {
+      return Math.round((value || 0) * servings);
+    };
+
+    const nutrients = [
+      {
+        name: "Calories",
+        value: calculateScaledValue(recipe.calories),
+        unit: "kcal",
+        icon: "🔥",
+        color: "emerald",
+      },
+      {
+        name: "Protein",
+        value: calculateScaledValue(recipe.protein),
+        unit: "g",
+        icon: "💪",
+        color: "blue",
+      },
+      {
+        name: "Carbohydrates",
+        value: calculateScaledValue(recipe.carbohydrates),
+        unit: "g",
+        icon: "🌾",
+        color: "amber",
+      },
+      {
+        name: "Fats",
+        value: calculateScaledValue(recipe.fats),
+        unit: "g",
+        icon: "🥑",
+        color: "rose",
+      },
+    ];
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="p-6 rounded-2xl bg-white/80 dark:bg-gray-800/80 
+          backdrop-blur-sm border border-white/20 dark:border-gray-700/20
+          relative overflow-hidden"
+      >
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute -top-24 -right-24 w-48 h-48 
+            bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 
+            rounded-full blur-3xl"
+          ></div>
+          <div
+            className="absolute -bottom-24 -left-24 w-48 h-48 
+            bg-gradient-to-br from-cyan-500/10 to-emerald-500/10 
+            rounded-full blur-3xl"
+          ></div>
+        </div>
+
+        {/* Title */}
+        <div className="relative mb-8">
+          <h3
+            className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 
+            dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent"
+          >
+            Nutritional Breakdown
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Values per {servings} serving{servings > 1 ? "s" : ""}
+          </p>
+        </div>
+
+        {/* Nutrients Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          {nutrients.map((nutrient, index) => (
+            <motion.div
+              key={nutrient.name}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.02 }}
+              className="relative group"
+            >
+              <div
+                className="p-6 rounded-xl bg-gradient-to-br from-white/50 to-white/30 
+                dark:from-gray-800/50 dark:to-gray-800/30 backdrop-blur-sm
+                border border-white/10 dark:border-gray-700/10
+                transition-all duration-300
+                hover:shadow-lg hover:border-emerald-500/20 dark:hover:border-emerald-500/20"
+              >
+                {/* Hexagonal Background Pattern */}
+                <div className="absolute inset-0 opacity-5 dark:opacity-10">
+                  <div
+                    className="w-full h-full"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 17.5c4.142 0 7.5-3.358 7.5-7.5S14.142 2.5 10 2.5 2.5 5.858 2.5 10s3.358 7.5 7.5 7.5z' fill='%23000000' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+                      backgroundSize: "20px 20px",
+                    }}
+                  />
+                </div>
+
+                {/* Icon */}
+                <div className="relative flex justify-center mb-3">
+                  <motion.span
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      rotate: [0, 10, -10, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                    }}
+                    className="text-4xl"
+                  >
+                    {nutrient.icon}
+                  </motion.span>
+                </div>
+
+                {/* Value */}
+                <div className="text-center">
+                  <motion.span
+                    className="text-2xl font-bold bg-gradient-to-r 
+                      from-emerald-600 to-cyan-600 dark:from-emerald-400 
+                      dark:to-cyan-400 bg-clip-text text-transparent"
+                  >
+                    {nutrient.value}
+                  </motion.span>
+                  <span className="ml-1 text-sm text-gray-600 dark:text-gray-400">
+                    {nutrient.unit}
+                  </span>
+                </div>
+
+                {/* Label */}
+                <div className="mt-2 text-center">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    {nutrient.name}
+                  </span>
+                </div>
+
+                {/* Decorative Ring */}
+                <div
+                  className="absolute inset-0 rounded-xl border-2 border-emerald-500/0 
+                  group-hover:border-emerald-500/20 dark:group-hover:border-emerald-400/20 
+                  transition-all duration-300"
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Additional Info Card */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 p-4 rounded-xl bg-gradient-to-br 
+            from-emerald-500/5 to-cyan-500/5
+            border border-emerald-500/10 dark:border-emerald-400/10"
+        >
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-xl">💡</span>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Values are calculated based on your selected serving size
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  // Add PropTypes
+  NutritionalBreakdown.propTypes = {
+    recipe: PropTypes.shape({
+      calories: PropTypes.number,
+      protein: PropTypes.number,
+      carbohydrates: PropTypes.number,
+      fats: PropTypes.number,
+    }).isRequired,
+    servings: PropTypes.number.isRequired,
   };
 
   if (loading) {
@@ -224,8 +405,8 @@ export default function RecipeDetails() {
                 exit={{ opacity: 0, y: -20 }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-8"
               >
-                {/* Nutritional Chart */}
-                <ChartComponent recipe={recipe} servings={servings} />
+                {/* Nutritional Breakdown */}
+                <NutritionalBreakdown recipe={recipe} servings={servings} />
 
                 {/* Time Information */}
                 <div className="space-y-4">
