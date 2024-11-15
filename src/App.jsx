@@ -16,7 +16,7 @@ import UserDashboard from "./pages/UserDashboard";
 import { AuthProvider } from "./context/AuthContext";
 import RecipeExplorer from "./pages/RecipeExplorer";
 import RecipeDetails from "./pages/RecipeDetails";
-import MealPlanner from "./pages/MealPlanner";
+import ShoppingListGenerator from "./pages/ShoppingListGenerator";
 
 // Move the routes into a separate component that will be wrapped by Router
 function AppRoutes() {
@@ -66,14 +66,6 @@ function AppRoutes() {
               }
             />
             <Route
-              path="/meal-planner"
-              element={
-                <ProtectedRoute>
-                  <MealPlanner />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/home"
               element={
                 <ProtectedRoute>
@@ -105,6 +97,10 @@ function AppRoutes() {
                   <RecipeDetails />
                 </ProtectedRoute>
               }
+            />
+            <Route
+              path="/shopping-list-generator"
+              element={<ShoppingListGenerator />}
             />
             <Route
               path="/"

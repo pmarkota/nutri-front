@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
+import PropTypes from "prop-types";
 
 export default function Navbar() {
   const { isAuthenticated, logout } = useAuth();
@@ -30,34 +31,22 @@ export default function Navbar() {
     <Link
       to={to}
       onClick={() => setActiveLink(to)}
-      className="relative group px-4 py-2"
+      className={`px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 
+        hover:text-gray-900 dark:hover:text-white transition-colors duration-200
+        ${
+          activeLink === to
+            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+            : ""
+        }`}
     >
-      <span
-        className={`relative z-10 text-gray-700 dark:text-gray-300 group-hover:text-emerald-500 
-        dark:group-hover:text-emerald-400 transition-colors duration-200
-        ${activeLink === to ? "text-emerald-500 dark:text-emerald-400" : ""}`}
-      >
-        {children}
-      </span>
-      {/* Animated background effect */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 
-          dark:from-emerald-500/20 dark:to-cyan-500/20 rounded-lg z-0"
-        initial={{ scale: 0, opacity: 0 }}
-        whileHover={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.2 }}
-      />
-      {/* Active indicator */}
-      {activeLink === to && (
-        <motion.div
-          layoutId="activeIndicator"
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-cyan-500"
-          initial={false}
-          transition={{ type: "spring", stiffness: 380, damping: 30 }}
-        />
-      )}
+      {children}
     </Link>
   );
+
+  NavLink.propTypes = {
+    to: PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+  };
 
   return (
     <motion.nav
@@ -91,7 +80,7 @@ export default function Navbar() {
                 <NavLink to="/home">Home</NavLink>
                 <NavLink to="/dashboard">Dashboard</NavLink>
                 <NavLink to="/recipes">Recipes</NavLink>
-                <NavLink to="/meal-planner">Meal Planner</NavLink>
+                <NavLink to="/shopping-list-generator">Shopping List</NavLink>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -227,7 +216,7 @@ export default function Navbar() {
                   <NavLink to="/home">Home</NavLink>
                   <NavLink to="/dashboard">Dashboard</NavLink>
                   <NavLink to="/recipes">Recipes</NavLink>
-                  <NavLink to="/meal-planner">Meal Planner</NavLink>
+                  <NavLink to="/shopping-list-generator">Shopping List</NavLink>
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={handleLogout}
