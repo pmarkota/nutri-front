@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import PageTransition from "../components/PageTransition";
 import FilterSection from "../components/recipe-explorer/FilterSection";
 import RecipeGrid from "../components/recipe-explorer/RecipeGrid";
-import LoadingAnimation from "../components/recipe-explorer/LoadingAnimation";
+import LoadingGrid from "../components/recipe-explorer/LoadingGrid";
 import FloatingElements from "../components/recipe-explorer/FloatingElements";
 
 export default function RecipeExplorer() {
@@ -138,7 +138,7 @@ export default function RecipeExplorer() {
           />
 
           {loading ? (
-            <LoadingAnimation />
+            <LoadingGrid />
           ) : (
             <RecipeGrid recipes={recipes} favoriteRecipes={favoriteRecipes} />
           )}
