@@ -149,10 +149,17 @@ export default function RecipeDetails() {
 
   const parseIngredients = (ingredientsString) => {
     try {
-      return JSON.parse(ingredientsString || "[]");
+      const ingredients = JSON.parse(ingredientsString || "[]");
+
+      return ingredients.map((ingredient) => {
+        const [quantity, ...nameParts] = ingredient.split(" ");
+        return {
+          quantity: quantity,
+          name: nameParts.join(" "),
+        };
+      });
     } catch (error) {
       console.error("Error parsing ingredients:", error);
-
       return [];
     }
   };
@@ -1171,30 +1178,45 @@ export default function RecipeDetails() {
               >
                 <div
                   className="relative overflow-hidden rounded-2xl bg-white/80 dark:bg-gray-800/80 
-
                   backdrop-blur-sm border border-white/20 dark:border-gray-700/20 p-8"
                 >
-                  <div className="relative">
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-gray-700 dark:text-gray-200 text-lg leading-relaxed whitespace-pre-wrap"
-                    >
-                      {recipe.instructions}
-                    </motion.div>
+                  <div className="relative space-y-6">
+                    {recipe.instructions.split("\n").map((step, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex gap-4 group"
+                      >
+                        {/* Step Number */}
+                        <div
+                          className="flex-shrink-0 w-10 h-10 flex items-center justify-center 
+                          bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 
+                          dark:from-emerald-500/20 dark:to-cyan-500/20 
+                          rounded-full text-emerald-600 dark:text-emerald-400 
+                          font-semibold text-lg"
+                        >
+                          {index + 1}
+                        </div>
+
+                        {/* Step Content */}
+                        <div className="flex-1">
+                          <p className="text-gray-700 dark:text-gray-200 text-lg leading-relaxed">
+                            {step}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
 
                   {/* Subtle gradient decorations */}
-
                   <div
                     className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br 
-
                     from-emerald-500/5 to-cyan-500/5 rounded-full blur-2xl"
                   />
-
                   <div
                     className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br 
-
                     from-cyan-500/5 to-emerald-500/5 rounded-full blur-2xl"
                   />
                 </div>

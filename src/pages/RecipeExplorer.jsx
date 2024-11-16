@@ -8,6 +8,8 @@ import FilterSection from "../components/recipe-explorer/FilterSection";
 import RecipeGrid from "../components/recipe-explorer/RecipeGrid";
 import LoadingGrid from "../components/recipe-explorer/LoadingGrid";
 import FloatingElements from "../components/recipe-explorer/FloatingElements";
+import AddRecipeFAB from "../components/recipe-explorer/AddRecipeFAB";
+import AddRecipeModal from "../components/recipe-explorer/AddRecipeModal";
 
 export default function RecipeExplorer() {
   const [recipes, setRecipes] = useState([]);
@@ -21,6 +23,7 @@ export default function RecipeExplorer() {
     nameSearchTerm: "",
   });
   const [favoriteRecipes, setFavoriteRecipes] = useState(new Set());
+  const [isAddRecipeModalOpen, setIsAddRecipeModalOpen] = useState(false);
 
   // Fetch recipes function
   const fetchRecipes = async (currentFilters) => {
@@ -143,6 +146,15 @@ export default function RecipeExplorer() {
             <RecipeGrid recipes={recipes} favoriteRecipes={favoriteRecipes} />
           )}
         </div>
+
+        <AddRecipeFAB onClick={() => setIsAddRecipeModalOpen(true)} />
+        <AddRecipeModal
+          isOpen={isAddRecipeModalOpen}
+          onClose={() => {
+            setIsAddRecipeModalOpen(false);
+            fetchRecipes(filters);
+          }}
+        />
       </div>
     </PageTransition>
   );
